@@ -29,6 +29,8 @@ Step 3. Implement "IPermissionResultHandler" interface in activity or fragment:
 ```xml
 class MainActivity : AppCompatActivity(), IPermissionResultHandler {
 
+    private val permissionHelper: IPermissionRequestHelper = PermissionRequestHelper(this)
+
     ...
     
     override fun onPermissionsGranted() {
@@ -66,6 +68,8 @@ Step 5. Request permission(s):
                 permissionsRequestCode = 0x1
      )
 ```
+
+For using Dagger 2, library provide PermissionModule.
 
 ### MIT License
 
