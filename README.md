@@ -17,10 +17,54 @@ allprojects {
 ```
   
 Step 2. Add the dependency:
+
 ```xml
 dependencies {
-    implementation 'com.github.DmytroDmytryshyn:PermissionLibrary:1.0'
+    implementation 'com.github.DmytroDmytryshyn:PermissionLibrary:1.1'
 }
+```
+
+Step 3. Implement "IPermissionResultHandler" interface in activity or fragment:
+
+```xml
+class MainActivity : AppCompatActivity(), IPermissionResultHandler {
+
+    ...
+    
+    override fun onPermissionsGranted() {
+    }
+
+    override fun showRationale(reGrantPermissions: () -> Unit) {
+    }
+
+    override fun onDoNotAskAgainChecked() {
+    }
+}
+```
+
+Step 4. Handle onRequestPermissionsResult:
+
+```xml
+    ...
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        permission.onRequestPermissionsResult(
+            permissionResultHandler = this,
+            requestCode = requestCode,
+            grantResults = grantResults
+        )
+    }
+```
+
+Step 5. Request permission(s):
+
+```xml
+    ...
+     permission.grantPermissions(
+                permissionResultHandler = this,
+                permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                permissionsRequestCode = 0x1
+     )
 ```
 
 ### MIT License
