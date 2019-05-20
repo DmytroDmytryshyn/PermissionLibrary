@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import javax.inject.Inject
 
@@ -18,7 +19,6 @@ class PermissionRequestHelper @Inject constructor(private val context: Context) 
     override fun isPermissionsGranted(permissions: Array<String>) = getNonGrantedPermissions(permissions).isEmpty()
 
     override fun grantPermissions(
-        activity: Activity,
         permissionResultHandler: IPermissionResultHandler,
         permissions: Array<String>,
         permissionsRequestCode: Int
@@ -26,14 +26,13 @@ class PermissionRequestHelper @Inject constructor(private val context: Context) 
         this.permissionsRequestCode = permissionsRequestCode
         nonGrantedPermissionsHolder.addNonGrantedPermissions(getNonGrantedPermissions(permissions))
         if (!nonGrantedPermissionsHolder.isAllPermissionsGranted) {
-            performPermissionsRequest(activity)
+            performPermissionsRequest(permissionResultHandler)
         } else {
             permissionResultHandler.onPermissionsGranted()
         }
     }
 
     override fun onRequestPermissionsResult(
-        activity: Activity,
         permissionResultHandler: IPermissionResultHandler,
         requestCode: Int,
         grantResults: IntArray
@@ -43,35 +42,48 @@ class PermissionRequestHelper @Inject constructor(private val context: Context) 
             if (nonGrantedPermissionsHolder.isAllPermissionsGranted) {
                 permissionResultHandler.onPermissionsGranted()
             } else if (grantResults.isNotEmpty()) {
-                handlePermissionDenied(activity, permissionResultHandler)
+                handlePermissionDenied(permissionResultHandler)
             }
         }
     }
     //endregion
 
     //region Utility API
-    private fun performPermissionsRequest(activity: Activity) {
-        ActivityCompat.requestPermissions(
-            activity,
-            nonGrantedPermissionsHolder.permissionsAsArray,
-            permissionsRequestCode
-        )
+    private fun performPermissionsRequest(permissionResultHandler: IPermissionResultHandler) {
+        when (permissionResultHandler) {
+            is Activity -> ActivityCompat.requestPermissions(
+                permissionResultHandler,
+                nonGrantedPermissionsHolder.permissionsAsArray,
+                permissionsRequestCode
+            )
+            is Fragment -> permissionResultHandler.requestPermissions(
+                nonGrantedPermissionsHolder.permissionsAsArray,
+                permissionsRequestCode
+            )
+            else -> throw IllegalArgumentException("IPermissionResultHandler must be Activity or Fragment!")
+        }
     }
 
     private fun handlePermissionDenied(
-        activity: Activity,
         permissionResultHandler: IPermissionResultHandler
     ) {
-        if (shouldShowRationale(activity)) {
+        if (shouldShowRationale(permissionResultHandler)) {
             permissionResultHandler.showRationale {
-                performPermissionsRequest(activity)
+                performPermissionsRequest(permissionResultHandler)
             }
         } else {
             permissionResultHandler.onDoNotAskAgainChecked()
         }
     }
 
-    private fun shouldShowRationale(activity: Activity): Boolean {
+    private fun shouldShowRationale(permissionResultHandler: IPermissionResultHandler): Boolean {
+        val activity: Activity
+        when(permissionResultHandler) {
+            is Activity -> activity = permissionResultHandler
+            is Fragment -> activity = permissionResultHandler.activity!!
+            else -> throw IllegalArgumentException("IPermissionResultHandler must be Activity or Fragment!")
+        }
+
         for (permission in nonGrantedPermissionsHolder.getPermissions()) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
                 return true

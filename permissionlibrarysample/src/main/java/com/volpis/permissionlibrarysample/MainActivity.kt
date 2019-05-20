@@ -1,7 +1,6 @@
 package com.volpis.permissionlibrarysample
 
 import android.Manifest
-import android.app.AlertDialog
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
@@ -32,7 +31,6 @@ class MainActivity : AppCompatActivity(), IPermissionResultHandler {
 
         mainActivityTestPermButton.setOnClickListener {
             permission.grantPermissions(
-                activity = this,
                 permissionResultHandler = this,
                 permissions = MAIN_ACTIVITY_PERMISSIONS,
                 permissionsRequestCode = PERMISSIONS_REQUEST_CODE
@@ -43,7 +41,6 @@ class MainActivity : AppCompatActivity(), IPermissionResultHandler {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         permission.onRequestPermissionsResult(
-            activity = this,
             permissionResultHandler = this,
             requestCode = requestCode,
             grantResults = grantResults
@@ -57,31 +54,11 @@ class MainActivity : AppCompatActivity(), IPermissionResultHandler {
     }
 
     override fun showRationale(reGrantPermissions: () -> Unit) {
-        window.decorView.postDelayed({
-            AlertDialog.Builder(this)
-                .setMessage("Please, grant permission so we can continue!")
-                .setPositiveButton("Ok") { _, _ ->
-                    reGrantPermissions.invoke()
-                }
-                .setNegativeButton("Cancel") { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .create()
-                .show()
-        }, 300)
+        Toast.makeText(this, "showRationale", Toast.LENGTH_SHORT).show()
     }
 
     override fun onDoNotAskAgainChecked() {
-        AlertDialog.Builder(this)
-            .setMessage("Please go to settings and grand permission by yourself!")
-            .setPositiveButton("Ok") { _, _ ->
-                Toast.makeText(this@MainActivity, "Go to settings!", Toast.LENGTH_SHORT).show()
-            }
-            .setNegativeButton("Cancel") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .create()
-            .show()
+        Toast.makeText(this, "onDoNotAskAgainChecked", Toast.LENGTH_SHORT).show()
     }
     //endregion
 }
