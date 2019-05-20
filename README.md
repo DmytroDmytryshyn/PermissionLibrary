@@ -1,3 +1,4 @@
+[![](https://jitpack.io/v/DmytroDmytryshyn/PermissionLibrary.svg)](https://jitpack.io/#DmytroDmytryshyn/PermissionLibrary)
 # PermissionLibrary
 
 An a lightweight permissions request library.
