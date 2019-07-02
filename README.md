@@ -69,8 +69,6 @@ Step 5. Request permission(s):
      )
 ```
 
-For using Dagger 2, library provide PermissionModule.
-
 ### MIT License
 
 ```
