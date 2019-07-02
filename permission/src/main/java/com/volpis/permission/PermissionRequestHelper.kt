@@ -6,9 +6,8 @@ import android.content.pm.PackageManager
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
-import javax.inject.Inject
 
-class PermissionRequestHelper @Inject constructor(private val context: Context) : IPermissionRequestHelper {
+class PermissionRequestHelper constructor(private val context: Context) : IPermissionRequestHelper {
 
     //region Fields
     private val nonGrantedPermissionsHolder: PermissionsHolder = PermissionsHolder()
@@ -113,6 +112,7 @@ class PermissionRequestHelper @Inject constructor(private val context: Context) 
         }
 
         fun addNonGrantedPermissions(nonGrantedPermissions: List<String>) {
+            permissions.clear()
             permissions.addAll(nonGrantedPermissions)
         }
 
